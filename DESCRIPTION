@@ -1,0 +1,17 @@
+Package: HMBART
+Title: Heterogeneous Causal Mediation Analysis with Bayesian Additive
+        Regression Trees
+Version: 0.1.0
+Authors@R: 
+    person("Chen", "Liu", , "chen.liu@pitt.edu", role = c("aut", "cre"))
+Description: Heterogeneous Causal Mediation Analysis with Bayesian Additive Regression Trees
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports: bartMachine, ggplot2, gridExtra, xgboost,
+        SHAPforxgboost, rpart, rpart.plot
+NeedsCompilation: no
+Packaged: 2024-12-03 07:38:27 UTC; chl471
+Author: Chen Liu [aut, cre]
+Maintainer: Chen Liu <chen.liu@pitt.edu>
