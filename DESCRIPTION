@@ -10,7 +10,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports: bartMachine, ggplot2, gridExtra, xgboost,
-        SHAPforxgboost, rpart, rpart.plot
+        SHAPforxgboost, rpart, rpart.plot, mgcv
 NeedsCompilation: no
 Packaged: 2024-12-03 07:38:27 UTC; chl471
 Author: Chen Liu [aut, cre]
