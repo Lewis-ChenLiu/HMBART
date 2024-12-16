@@ -1,6 +1,8 @@
-R code implementation of Heterogeneous Causal Mediation Analysis with Bayesian Additive Regression Trees
+R code implementation of Heterogeneous Causal Mediation Analysis Using Bayesian Additive Regression Trees
 
 ### Installation
+
+This package is build on `bartMachine` package in R, you will first need to install Java and `rJava` package and configure your computer, then you can install the package from CRAN or compile from source. Detailed instructions are on <https://github.com/kapelner/bartMachine>.
 
 ```R
 if (!"devtools" %in% rownames(installed.packages())) {
@@ -8,13 +10,10 @@ if (!"devtools" %in% rownames(installed.packages())) {
 }
 
 # install the HMBART R package
-library(devtools)
-if (!"HMBART" %in% rownames(installed.packages())) {
-  install_github('Lewis-ChenLiu/HMBART')
-}
+devtools::install_github('Lewis-ChenLiu/HMBART')
 
 # load, adjust storage and num_cores according to the environment
-options(java.parameters = "-Xmx64g")
+options(java.parameters = "-Xmx8g")
 library(bartMachine)
 set_bart_machine_num_cores(num_cores = 10)
 library(HMBART)
@@ -22,81 +21,78 @@ library(HMBART)
 
 ### Example
 
-In this part, we will show how to use HMBART with a simulated dataset.
-
-```R
-### Generate data
-gen = function(n){
-  
-  sigma.m = 1; sigma.y = 1; 
-  e.m = rnorm(n, 0, sigma.m)
-  e.y = rnorm(n, 0, sigma.y)
-    
-  x1 = runif(n); x2 = runif(n); x3 = runif(n); x4 = runif(n); x5 = runif(n);
-  ps = plogis(x2 * x3 - x4 * x5)
-  t = rbinom(n, 1, ps)
-  
-  b0.m = 1 / (x1 + 1) + x2 
-  b1.m = 2 * abs(x3 - 0.5)
-  
-  b0.y = x5
-  b1.y = 2 * x4
-  b2.y = 4 * (x5 - 0.5)^2
-  b3.y = 2 * sin(pi * x1 * x2)
-  
-  m = b0.m + b1.m * t + e.m
-  y = b0.y + b1.y * t + b2.y * m^2 + b3.y * t * m + e.y
-  
-  m0 = b0.m
-  m1 = b0.m + b1.m
-  y1m1 = b0.y + b1.y + b2.y * m1^2 + b3.y * m1
-  y1m0 = b0.y + b1.y + b2.y * m0^2 + b3.y * m0
-  y0m0 = b0.y + b2.y * m0^2
-  
-  true_TE = y1m1 - y0m0
-  true_NIE = y1m1 - y1m0
-  true_NDE = y1m0 - y0m0
-  
-  data = cbind.data.frame(x1 = x1, x2 = x2, x3 = x3, x4 = x4, x5 = x5,
-                          t = t, m = m, y = y, true_TE, true_NIE, true_NDE)
-  
-  return(data)
-}
-
-data = gen(500)
-```
+In this part, we will show how to use HMBART with a simulated dataset. The dataset is included, and more details about the scenario can be found in Case (4) of our paper.
 
 ##### Estimation
 
-```
+```R
 ### Default setting
-hmbart_obj = hmbart(data, X_name = c('x1', 'x2', 'x3', 'x4', 'x5'), t_name = 't', m_name = 'm', y_name = 'y')
+hmbart_obj = hmbart(data, X = c('x1', 'x2', 'x3', 'x4', 'x5'), t = 't', m = 'm', y = 'y')
 
 ### Cross validation
-# hmbart_obj = hmbart(data, X_name = c('x1', 'x2', 'x3', 'x4', 'x5'), t_name = 't', m_name = 'm', y_name = 'y', CV = TRUE)
+# hmbart_obj = hmbart(data, X = c('x1', 'x2', 'x3', 'x4', 'x5'), t = 't', m = 'm', y = 'y', CV = TRUE)
 
 > head(hmbart_obj$effects)
-        TE       TE.l     TE.u      NDE       NDE.l    NDE.u       NIE      NIE.l    NIE.u
-1 3.735600  1.2307954 6.771175 2.919720  1.04763439 5.053429 0.8158800 -0.9256589 3.487182
-2 2.710184  0.4905572 5.084135 2.104954  0.25117779 3.796468 0.6052298 -0.9629884 2.785807
-3 1.961961 -0.0735026 4.068640 1.637126 -0.13325504 3.424064 0.3248344 -1.2648673 2.097993
-4 1.884478 -0.0416991 4.052631 1.542105 -0.06756335 3.196514 0.3423738 -0.9965982 2.112362
-5 2.575909  0.1687347 5.236323 1.990379  0.23918237 3.460496 0.5855296 -1.4740843 2.937700
-6 4.259714  1.9944826 7.086448 3.633967  1.91310495 5.456703 0.6257468 -1.0851516 2.937125
+        TE       TE.l     TE.u       NDE      NDE.l    NDE.u       NIE      NIE.l    NIE.u
+1 3.932867  1.6050965 6.644100 2.8208519  1.1737146 5.060531 1.1120149 -1.3211790 3.883400
+2 1.920392 -0.1314570 4.100765 1.3240281 -0.3432851 3.016575 0.5963642 -0.6991594 2.214197
+3 5.054568  1.8358222 8.923401 2.3576828  0.8865221 3.683696 2.6968853  0.0000000 6.392640
+4 4.765372  2.9060400 7.505387 3.7823592  2.5432603 5.381703 0.9830128 -0.5238947 3.369680
+5 3.053114  1.1543714 5.210438 2.2828638  1.0364591 4.198749 0.7702501 -1.2907950 2.768051
+6 1.080673 -0.4419588 3.077158 0.5732811 -0.5398795 1.971616 0.5073916 -0.7375299 2.207598
 
 ```
 
 ##### Visualization
 
-```
+```R
 ### SHAP plot
 shapplot(hmbart_obj)
+```
 
+The SHAP plot ranks variables by importance (top to bottom), with yellow indicating small values and red indicating large values.
+
+![SHAP Image](figs/shap.png)
+
+```R
 ### Dependent plot
 dependentplot(hmbart_obj, 'x1')
+```
 
+Dependency plots show how NDE and NIE change with the variable. Individual estimates are depicted as orange or black dots, with yellow or gray credible intervals; orange dots and yellow shades indicate statistically significant estimates. A GAM fit illustrates the trend, with blue dots for individual estimates and a blue curve tracing the smoothed NDE/NIE changes over the variable.
+
+![Dependent Image](figs/dep.png)
+
+```R
 ### Tree plot
 treeplot(hmbart_obj)
 ```
 
-![Sample Image](example.png)
+Decision trees to identify subgroups, with branch conditions defining moderators. Node values show estimated effects, and percentages represent subgroup proportions.
+
+![Dependent Image](figs/tree.png)
+
+### Debug Tips
+
+The most common error encountered is `java.lang.OutOfMemoryError`. To address this, we recommend the following steps: 
+
+**1. Increase Memory Allocation**
+
+```R
+options(java.parameters = "-Xmx32g")
+```
+
+Here, `-Xmx32g` increases the maximum heap size to 32GB. You can customize this value based on your system's available memory.
+
+**Important**: Restart your R session after making this change.
+
+**2. Reduce** `n_process_samples`
+
+Lower the `n_process_samples` parameter to reduce memory usage during model execution. For example:
+
+```
+### Default setting
+hmbart_obj = hmbart(data, X = c('x1', 'x2', 'x3', 'x4', 'x5'), t = 't', m = 'm', y = 'y', n_process_samples = 1e4)
+```
+
+Decreasing this value reduces memory usage but increases runtime, making it suitable for systems with limited memory.
