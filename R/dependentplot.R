@@ -1,5 +1,5 @@
 #' @importFrom mgcv gam
-#' @importFrom ggplot2 ggplot aes geom_errorbar geom_point geom_line geom_ribbon labs theme_minimal ylim
+#' @importFrom ggplot2 ggplot aes geom_linerange geom_point geom_line geom_ribbon labs theme_minimal ylim
 #' @importFrom gridExtra grid.arrange
 #' @export
 dependentplot = function(hmbart_obj, varname) {
@@ -31,7 +31,7 @@ dependentplot = function(hmbart_obj, varname) {
   ylims = c(min(hmbart_obj$effects$NDE.l) - 0.5, max(hmbart_obj$effects$NDE.u) + 0.5)
   if(mean(is.na(dat_NDE$NDE_1)) == 1){
     plot_NDE_est = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NDE_0.l, ymax = NDE_0.u), color= "lightgrey", width = 0.1) +
+      geom_linerange(aes(ymin = NDE_0.l, ymax = NDE_0.u), color = "lightgrey", width = 0.1) +
       geom_point(aes(y = NDE_0), color = "black", size = 0.5) +
       labs(
         title = "",
@@ -40,7 +40,7 @@ dependentplot = function(hmbart_obj, varname) {
       ) +   theme_minimal() 
   }else if(mean(is.na(dat_NDE$NDE_0)) == 1){
     plot_NDE_est = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NDE_1.l, ymax = NDE_1.u), color = "#fee090", width = 0.1) +
+      geom_linerange(aes(ymin = NDE_1.l, ymax = NDE_1.u), color = "#fee090", width = 0.1) +
       geom_point(aes(y = NDE_1), color = "#ff7f0e", size = 0.5) +
       labs(
         title = "",
@@ -49,8 +49,8 @@ dependentplot = function(hmbart_obj, varname) {
       ) +   theme_minimal()  
   }else{
     plot_NDE_est = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NDE_0.l, ymax = NDE_0.u), color= "lightgrey", width = 0.1) +
-      geom_errorbar(aes(ymin = NDE_1.l, ymax = NDE_1.u), color = "#fee090", width = 0.1) +
+      geom_linerange(aes(ymin = NDE_0.l, ymax = NDE_0.u), color = "lightgrey", width = 0.1) +
+      geom_linerange(aes(ymin = NDE_1.l, ymax = NDE_1.u), color = "#fee090", width = 0.1) +
       geom_point(aes(y = NDE_0), color = "black", size = 0.5) +
       geom_point(aes(y = NDE_1), color = "#ff7f0e", size = 0.5) +
       labs(
@@ -92,7 +92,7 @@ dependentplot = function(hmbart_obj, varname) {
   ylims = c(min(hmbart_obj$effects$NIE.l) - 0.5, max(hmbart_obj$effects$NIE.u) + 0.5)
   if(mean(is.na(dat_NIE$NIE_1)) == 1){
     plot_NIE_est = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NIE_0.l, ymax = NIE_0.u), color= "lightgrey", width = 0.1) +
+      geom_linerange(aes(ymin = NIE_0.l, ymax = NIE_0.u), color = "lightgrey", width = 0.1) +
       geom_point(aes(y = NIE_0), color = "black", size = 0.5) +
       labs(
         title = "",
@@ -101,7 +101,7 @@ dependentplot = function(hmbart_obj, varname) {
       ) +   theme_minimal() 
   }else if(mean(is.na(dat_NIE$NIE_0)) == 1){
     plot_NIE_est = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NIE_1.l, ymax = NIE_1.u), color = "#fee090", width = 0.1) +
+      geom_linerange(aes(ymin = NIE_1.l, ymax = NIE_1.u), color = "#fee090", width = 0.1) +
       geom_point(aes(y = NIE_1), color = "#ff7f0e", size = 0.5) +
       labs(
         title = "",
@@ -110,8 +110,8 @@ dependentplot = function(hmbart_obj, varname) {
       ) +   theme_minimal() 
   }else{
     plot_NIE_est = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NIE_0.l, ymax = NIE_0.u), color= "lightgrey", width = 0.1) +
-      geom_errorbar(aes(ymin = NIE_1.l, ymax = NIE_1.u), color = "#fee090", width = 0.1) +
+      geom_linerange(aes(ymin = NIE_0.l, ymax = NIE_0.u), color = "lightgrey", width = 0.1) +
+      geom_linerange(aes(ymin = NIE_1.l, ymax = NIE_1.u), color = "#fee090", width = 0.1) +
       geom_point(aes(y = NIE_0), color = "black", size = 0.5) +
       geom_point(aes(y = NIE_1), color = "#ff7f0e", size = 0.5) +
       labs(

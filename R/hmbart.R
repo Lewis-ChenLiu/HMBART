@@ -3,7 +3,7 @@
 hmbart = function(data, X, t, m, y, CV = FALSE,
                   num_trees = 100, num_tree_cvs = c(100), k_cvs = c(2, 3, 5),
                   nu_q_cvs = list(c(3, 0.9), c(3, 0.99), c(10, 0.75)),
-                  n_burn_in = 2000, n_after_burn_in = 500) {
+                  n_burn_in = 2000, n_after_burn_in = 500, n_process_samples = 1e5) {
 
   ### Extract variables
   X_name = X
@@ -22,6 +22,7 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
   fit_ps = bartMachine(X = data[, X_name], y = data$t, num_trees = num_trees,
                        num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in)
   data$ps = fit_ps$y_hat_train
+  rm(fit_ps)
 
   ### M model
   if(CV){
@@ -33,7 +34,7 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
                         num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in)
   }
 
-  ### Add M estimates
+  ### Add M estimates for outcome model
   data_m = data[, c(X_name, 't', 'ps')]
   data_m$t = 0
   m0 = predict(fit_m, data_m)
@@ -41,6 +42,28 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
   data_m$t = 1
   m1 = predict(fit_m, data_m)
   data$m1 = m1
+
+  ### Construct dataset
+  data_m = data[, c(X_name, 't', 'ps')]
+  data_m$t = 0
+  m0 = bart_machine_get_posterior(fit_m, data_m)$y_hat_posterior_samples
+  data_m$t = 1
+  m1 = bart_machine_get_posterior(fit_m, data_m)$y_hat_posterior_samples
+
+  cat('\n', 'Construct Dataset', '\n', sep = '')
+  pb = txtProgressBar(min = 1, max = n - 1, style = 3)
+  data_y_m0 = NULL; data_y_m1 = NULL;
+  data_y = data[, c(X_name, 't', 'ps', 'm', 'm0', 'm1')]
+  for(i in 1:n){
+    data_i = data_y[replicate(n_after_burn_in, i), ]
+    data_i$m = m0[i, ]
+    data_y_m0 = rbind(data_y_m0, data_i)
+    data_i$m = m1[i, ]
+    data_y_m1 = rbind(data_y_m1, data_i)
+    setTxtProgressBar(pb, i)
+  }
+  close(pb)
+  rm(fit_m)
 
   ### Y model
   if(CV){
@@ -52,26 +75,8 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
                         num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in)
   }
 
-  ### Add M estimates
-  data_m = data[, c(X_name, 't', 'ps')]
-  data_m$t = 0
-  m0 = bart_machine_get_posterior(fit_m, data_m)$y_hat_posterior_samples
-  data_m$t = 1
-  m1 = bart_machine_get_posterior(fit_m, data_m)$y_hat_posterior_samples
-
-  ### Construct dataset
-  data_y_m0 = NULL; data_y_m1 = NULL;
-  data_y = data[, c(X_name, 't', 'ps', 'm', 'm0', 'm1')]
-  for(i in 1:n){
-    data_i = data_y[replicate(n_after_burn_in, i), ]
-    data_i$m = m0[i, ]
-    data_y_m0 = rbind(data_y_m0, data_i)
-    data_i$m = m1[i, ]
-    data_y_m1 = rbind(data_y_m1, data_i)
-  }
-
   ### Predict
-  by_value = ifelse(nrow(data_y_m0) > 1e6, 1e5, as.integer(nrow(data_y_m0) / 5))
+  by_value = ifelse(nrow(data_y_m0) > 5 * n_process_samples, n_process_samples, as.integer(nrow(data_y_m0) / 5))
   breaks = c(seq(from = 1, to = nrow(data_y_m0), by = by_value), nrow(data_y_m0) + 1)
   post_y0m0 = NULL; post_y1m0 = NULL; post_y1m1 = NULL;
 
