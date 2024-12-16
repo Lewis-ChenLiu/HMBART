@@ -1,11 +1,12 @@
 #' @importFrom bartMachine bartMachine bartMachineCV bart_machine_get_posterior
 #' @export
-hmbart = function(data, X_name, t_name, m_name, y_name, CV = FALSE,
+hmbart = function(data, X, t, m, y, CV = FALSE,
                   num_trees = 100, num_tree_cvs = c(100), k_cvs = c(2, 3, 5),
                   nu_q_cvs = list(c(3, 0.9), c(3, 0.99), c(10, 0.75)),
                   n_burn_in = 2000, n_after_burn_in = 500) {
 
   ### Extract variables
+  X_name = X
   data$t = data[, t_name]
   data$m = data[, m_name]
   data$y = data[, y_name]
