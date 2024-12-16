@@ -1,4 +1,4 @@
-R code implementation of Heterogeneous Causal Mediation Analysis Using Bayesian Additive Regression Trees
+R code implementation of Heterogeneous Causal Mediation Analysis Using Bayesian Additive Regression Trees.
 
 ### Installation
 
