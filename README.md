@@ -21,7 +21,7 @@ library(HMBART)
 
 ### Example
 
-In this part, we will show how to use HMBART with a simulated dataset. The dataset is included, and more details about the scenario can be found in Case (4) of our paper.
+In this part, we will show how to use HMBART with a simulated dataset. The dataset `data.rds` is included, and more details about the scenario can be found in Case (4) of our paper.
 
 ##### Estimation
 
