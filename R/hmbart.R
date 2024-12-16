@@ -7,9 +7,9 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
 
   ### Extract variables
   X_name = X
-  data$t = data[, t_name]
-  data$m = data[, m_name]
-  data$y = data[, y_name]
+  data$t = data[, t]
+  data$m = data[, m]
+  data$y = data[, y]
   n = nrow(data)
 
   ### Standardization
