@@ -1,8 +1,10 @@
 #' @importFrom rpart rpart rpart.control
 #' @importFrom rpart.plot prp
 #' @export
-treeplot = function(hmbart_obj, cp = 0.01) {
+treeplot = function(hmbart_obj, cp = 0.01, seed = 42) {
   
+  set.seed(seed)
+  hmbart_obj$effects = hmbart_obj$h_effects
   ### Model
   X = hmbart_obj$data[, hmbart_obj$X_name]
   colnames(X) = hmbart_obj$X_name
