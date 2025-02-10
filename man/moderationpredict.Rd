@@ -10,7 +10,7 @@ moderationpredict(hmbart_obj, NDE_moderator_names = NULL, NDE_moderator_values =
                   num_trees = 100, n_burn_in = 2000, n_after_burn_in = 500, seed = 42)
 }
 \arguments{
-  \item{hmbart_obj}{An object of class \code{hmbart}, which contains the results from a Heterogeneous Causal Mediation Analysis using BART.}
+  \item{hmbart_obj}{An object returned by the hmbart function, containing data, covariates, and effect estimates.}
   \item{NDE_moderator_names}{A character vector specifying the names of moderators for the Natural Direct Effect (NDE).}
   \item{NDE_moderator_values}{A data frame specifying the values of the NDE moderators at which predictions should be made.}
   \item{NIE_moderator_names}{A character vector specifying the names of moderators for the Natural Indirect Effect (NIE).}
@@ -35,12 +35,11 @@ moderationpredict(hmbart_obj, NDE_moderator_names = NULL, NDE_moderator_values =
 \examples{
 # Example usage:
 \dontrun{
-hmbart_obj <- some_hmbart_model()
 moderationpredict(hmbart_obj, 
                   NDE_moderator_names = c("x2", "x5"),
-                  NDE_moderator_values = some_dataframe,
-                  NIE_moderator_names = c("x3", "x6"),
-                  NIE_moderator_values = another_dataframe)
+                  NDE_moderator_values = data.frame(x2 = c(1, 2), x5 = c(2, 3)),
+                  NIE_moderator_names = c("x3"),
+                  NIE_moderator_values = data.frame(x3 = c(1)))
 }
 }
 \author{
