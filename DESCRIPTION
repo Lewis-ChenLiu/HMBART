@@ -1,6 +1,6 @@
 Package: HMBART
 Title: Heterogeneous Causal Mediation Analysis Using Bayesian Additive Regression Trees
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: 
     person("Chen", "Liu", , "chen.liu@pitt.edu", role = c("aut", "cre"))
 Description: Heterogeneous Causal Mediation Analysis with Bayesian Additive Regression Trees
