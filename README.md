@@ -32,7 +32,7 @@ hmbart_obj = hmbart(data, X = c('x1', 'x2', 'x3', 'x4', 'x5'), t = 't', m = 'm',
 ### Cross validation
 # hmbart_obj = hmbart(data, X = c('x1', 'x2', 'x3', 'x4', 'x5'), t = 't', m = 'm', y = 'y', CV = TRUE)
 
-> head(hmbart_obj$effects)
+> head(hmbart_obj$h_effects)
         TE       TE.l     TE.u       NDE      NDE.l    NDE.u       NIE      NIE.l    NIE.u
 1 3.932867  1.6050965 6.644100 2.8208519  1.1737146 5.060531 1.1120149 -1.3211790 3.883400
 2 1.920392 -0.1314570 4.100765 1.3240281 -0.3432851 3.016575 0.5963642 -0.6991594 2.214197
