@@ -2,14 +2,15 @@
 #' @importFrom ggplot2 ggtitle theme element_text
 #' @importFrom gridExtra grid.arrange
 #' @export
-shapplot = function(hmbart_obj, seed = 42) {
+shapplot = function(hmbart_obj, moderator_names = NULL, seed = 42) {
   
   library(SHAPforxgboost)
   ### Model
-  X = as.matrix(hmbart_obj$data[, hmbart_obj$X_name])
-  colnames(X) = hmbart_obj$X_name
+  if(is.null(moderator_names)){moderator_names = hmbart_obj$X_name}
+  X = as.matrix(hmbart_obj$data[, moderator_names])
+  colnames(X) = moderator_names
   hmbart_obj$effects = hmbart_obj$h_effects
-
+  
   set.seed(seed)
   TE_model = xgboost(data = X, label = hmbart_obj$effects$TE, nrounds = 50, verbose = F)
   NDE_model = xgboost(data = X, label = hmbart_obj$effects$NDE, nrounds = 50, verbose = F)
@@ -27,7 +28,6 @@ shapplot = function(hmbart_obj, seed = 42) {
     ggtitle("SHAP Summary - NIE") + theme(plot.title = element_text(hjust = 0.5, ))
   
   ### Display
-  combined_plot = grid.arrange(shap_TE, shap_NDE, shap_NIE, ncol = 1, nrow = 3)
-  print(combined_plot)
-
+  invisible(grid.arrange(shap_TE, shap_NDE, shap_NIE, ncol = 1, nrow = 3))
+  
 }

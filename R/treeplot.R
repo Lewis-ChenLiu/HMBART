@@ -1,13 +1,15 @@
 #' @importFrom rpart rpart rpart.control
 #' @importFrom rpart.plot prp
 #' @export
-treeplot = function(hmbart_obj, cp = 0.01, seed = 42) {
+treeplot = function(hmbart_obj, moderator_names = NULL, cp = 0.01, seed = 42) {
   
   set.seed(seed)
   hmbart_obj$effects = hmbart_obj$h_effects
   ### Model
-  X = hmbart_obj$data[, hmbart_obj$X_name]
-  colnames(X) = hmbart_obj$X_name
+  if(is.null(moderator_names)){moderator_names = hmbart_obj$X_name}
+  X = data.frame(hmbart_obj$data[, moderator_names])
+  colnames(X) = moderator_names
+
   tree_NDE = rpart(hmbart_obj$effects$NDE ~ ., data = X, control = rpart.control(cp = cp))
   tree_NIE = rpart(hmbart_obj$effects$NIE ~ ., data = X, control = rpart.control(cp = cp))
   
