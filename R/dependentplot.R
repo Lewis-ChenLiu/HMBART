@@ -2,14 +2,81 @@
 #' @importFrom ggplot2 ggplot aes geom_linerange geom_point geom_line geom_ribbon labs theme_minimal ylim
 #' @importFrom gridExtra grid.arrange
 #' @export
-dependentplot = function(hmbart_obj, varname, ylims_NDE = NULL, ylims_NIE = NULL) {
+dependentplot = function(hmbart_obj, varname, TE = FALSE, ylims_TE = NULL, ylims_NDE = NULL, ylims_NIE = NULL) {
   
   hmbart_obj$effects = hmbart_obj$h_effects
-  ### Prepare the data for NDE
+  ### Prepare the data for TE
   X = data.frame(
     var = hmbart_obj$data[, varname], 
+    TE = hmbart_obj$effects$TE, 
     NDE = hmbart_obj$effects$NDE, 
     NIE = hmbart_obj$effects$NIE)
+
+    not_sig_TE = as.numeric(hmbart_obj$effects$TE.l < 0) * as.numeric(hmbart_obj$effects$TE.u > 0)
+  dat_TE = data.frame(
+    var = X$var,
+    TE = X$TE,
+    TE_0 = ifelse(not_sig_TE == 1, X$TE, NA),
+    TE_1 = ifelse(not_sig_TE == 0, X$TE, NA),
+    TE_0.l = ifelse(not_sig_TE == 1, hmbart_obj$effects$TE.l, NA),
+    TE_0.u = ifelse(not_sig_TE == 1, hmbart_obj$effects$TE.u, NA),
+    TE_1.l = ifelse(not_sig_TE == 0, hmbart_obj$effects$TE.l, NA),
+    TE_1.u = ifelse(not_sig_TE == 0, hmbart_obj$effects$TE.u, NA)
+  )
+  ### Splines fit for TE
+  gam_model = gam(TE ~ s(var), data = X)
+  pred = predict(gam_model, newdata = X, se.fit = TRUE)
+  dat_TE$TE_gam = pred$fit
+  dat_TE$TE_gam.l = pred$fit - 1.96 * pred$se.fit
+  dat_TE$TE_gam.u = pred$fit + 1.96 * pred$se.fit
+  
+  ### Plot for TE
+  if(is.null(ylims_TE)){
+    ylims = c(min(hmbart_obj$effects$TE.l) - 0.5, max(hmbart_obj$effects$TE.u) + 0.5)
+  }else{
+    ylims = ylims_TE
+  }
+  if(mean(is.na(dat_TE$TE_1)) == 1){
+    plot_TE_est = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
+      geom_linerange(aes(ymin = TE_0.l, ymax = TE_0.u), color = "lightgrey", width = 0.1) +
+      geom_point(aes(y = TE_0), color = "black", size = 0.5) +
+      labs(
+        title = "",
+        x = varname,
+        y = "TE"
+      ) +   theme_minimal() 
+  }else if(mean(is.na(dat_TE$TE_0)) == 1){
+    plot_TE_est = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
+      geom_linerange(aes(ymin = TE_1.l, ymax = TE_1.u), color = "#fee090", width = 0.1) +
+      geom_point(aes(y = TE_1), color = "#ff7f0e", size = 0.5) +
+      labs(
+        title = "",
+        x = varname,
+        y = "TE"
+      ) +   theme_minimal()  
+  }else{
+    plot_TE_est = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
+      geom_linerange(aes(ymin = TE_0.l, ymax = TE_0.u), color = "lightgrey", width = 0.1) +
+      geom_linerange(aes(ymin = TE_1.l, ymax = TE_1.u), color = "#fee090", width = 0.1) +
+      geom_point(aes(y = TE_0), color = "black", size = 0.5) +
+      geom_point(aes(y = TE_1), color = "#ff7f0e", size = 0.5) +
+      labs(
+        title = "",
+        x = varname,
+        y = "TE"
+      ) +   theme_minimal()  
+  }
+  plot_TE_gam = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
+    geom_point(aes(y = TE), color = "#1f77b4", size = 0.5) +
+    geom_line(aes(y = TE_gam), color = "#1f77b4") +
+    geom_ribbon(aes(ymin = TE_gam.l, ymax = TE_gam.u), alpha = 0.2, fill = "#1f77b4") + 
+    labs(
+      title = "",
+      x = varname,
+      y = "TE"
+    ) +   theme_minimal()
+
+  ### Prepare the data for NDE
   not_sig_NDE = as.numeric(hmbart_obj$effects$NDE.l < 0) * as.numeric(hmbart_obj$effects$NDE.u > 0)
   dat_NDE = data.frame(
     var = X$var,
@@ -140,8 +207,13 @@ dependentplot = function(hmbart_obj, varname, ylims_NDE = NULL, ylims_NIE = NULL
     ) +   theme_minimal()
   
   ### Combine and display
-  combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est,
-                               plot_NDE_gam, plot_NIE_gam, ncol = 2, nrow = 2)
+  if(TE){
+    combined_plot = grid.arrange(plot_TE_est, plot_NDE_est, plot_NIE_est,
+                                 plot_TE_gam, plot_NDE_gam, plot_NIE_gam, ncol = 3, nrow = 2)
+  }else{
+    combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est,
+                                 plot_NDE_gam, plot_NIE_gam, ncol = 2, nrow = 2)
+  }
   print(combined_plot)
   
 }

@@ -2,7 +2,7 @@
 #' @importFrom ggplot2 ggtitle theme element_text
 #' @importFrom gridExtra grid.arrange
 #' @export
-shapplot = function(hmbart_obj, moderator_names = NULL, seed = 42) {
+shapplot = function(hmbart_obj, moderator_names = NULL, TE = FALSE, seed = 42) {
   
   library(SHAPforxgboost)
   ### Model
@@ -28,6 +28,10 @@ shapplot = function(hmbart_obj, moderator_names = NULL, seed = 42) {
     ggtitle("SHAP Summary - NIE") + theme(plot.title = element_text(hjust = 0.5, ))
   
   ### Display
-  invisible(grid.arrange(shap_TE, shap_NDE, shap_NIE, ncol = 1, nrow = 3))
+  if(TE){
+    invisible(grid.arrange(shap_TE, shap_NDE, shap_NIE, ncol = 1, nrow = 3))
+  }else{
+    invisible(grid.arrange(shap_NDE, shap_NIE, ncol = 1, nrow = 2))
+  }
   
 }
