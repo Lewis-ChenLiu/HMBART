@@ -3,7 +3,7 @@
 hmbart = function(data, X, t, m, y, CV = FALSE,
                   num_trees = 100, num_tree_cvs = c(100), k_cvs = c(2, 3, 5),
                   nu_q_cvs = list(c(3, 0.9), c(3, 0.99), c(10, 0.75)),
-                  n_burn_in = 2000, n_after_burn_in = 500, n_process_samples = 1e5, seed = 42, fix = FALSE) {
+                  n_burn_in = 2000, n_after_burn_in = 500, n_process_samples = 1e5, seed = 42, fix = FALSE, ...) {
   
   set.seed(seed)
   model_seed = NULL
@@ -26,7 +26,7 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
 
   ### Fit propensity score
   fit_ps = bartMachine(X = data[, X_name], y = data$t, num_trees = num_trees,
-                       num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed)
+                       num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed, ...)
   data$ps = fit_ps$y_hat_train
   rm(fit_ps)
 
@@ -34,10 +34,10 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
   if(CV){
     fit_m = bartMachineCV(X = data[, c(X_name, 't', 'ps')], y = data$m,
                           num_tree_cvs = num_tree_cvs, k_cvs = k_cvs, nu_q_cvs = nu_q_cvs,
-                          num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed)
+                          num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed, ...)
   }else{
     fit_m = bartMachine(X = data[, c(X_name, 't', 'ps')], y = data$m, num_trees = num_trees,
-                        num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed)
+                        num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed, ...)
   }
 
   ### Add M estimates for outcome model
@@ -75,10 +75,10 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
   if(CV){
     fit_y = bartMachineCV(X = data[, c(X_name, 't', 'ps', 'm', 'm0', 'm1')], y = data$y,
                           num_tree_cvs = num_tree_cvs, k_cvs = k_cvs, nu_q_cvs = nu_q_cvs,
-                          num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed)
+                          num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed, ...)
   }else{
     fit_y = bartMachine(X = data[, c(X_name, 't', 'ps', 'm', 'm0', 'm1')], y = data$y, num_trees = num_trees,
-                        num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed)
+                        num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = model_seed, ...)
   }
 
   ### Predict
