@@ -2,7 +2,7 @@
 #' @export
 moderationpredict = function(hmbart_obj, NDE_moderator_names = NULL, NDE_moderator_values = NULL,
                              NIE_moderator_names = NULL, NIE_moderator_values = NULL, 
-                             num_trees = 100, n_burn_in = 2000, n_after_burn_in = 500, seed = 42) {
+                             num_trees = 100, n_burn_in = 2000, n_after_burn_in = 500, seed = 42, ...) {
   
   set.seed(seed)
   set_bart_machine_num_cores(num_cores = 1)
@@ -16,9 +16,9 @@ moderationpredict = function(hmbart_obj, NDE_moderator_names = NULL, NDE_moderat
   
   ### Model
   NDE_model = bartMachine(X = NDE_data, y = hmbart_obj$effects$NDE, num_trees = num_trees,
-                          num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = seed)
+                          num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = seed, ...)
   NIE_model = bartMachine(X = NIE_data, y = hmbart_obj$effects$NIE, num_trees = num_trees,
-                          num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = seed)
+                          num_burn_in = n_burn_in, num_iterations_after_burn_in = n_after_burn_in, seed = seed, ...)
   
   ### Predict
   NDE_pred_raw = bart_machine_get_posterior(NDE_model, NDE_moderator_values)$y_hat_posterior_samples

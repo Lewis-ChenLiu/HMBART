@@ -2,9 +2,11 @@
 #' @importFrom ggplot2 ggplot aes geom_linerange geom_point geom_line geom_ribbon labs theme_minimal ylim
 #' @importFrom gridExtra grid.arrange
 #' @export
-dependentplot = function(hmbart_obj, varname, TE = FALSE, ylims_TE = NULL, ylims_NDE = NULL, ylims_NIE = NULL) {
+dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, ylims_TE = NULL, ylims_NDE = NULL, ylims_NIE = NULL) {
   
   hmbart_obj$effects = hmbart_obj$h_effects
+  ### For variable have unique values less than 10 (default for spline)
+  k = min(max(length(unique(hmbart_obj$data[, varname])) - 2, 3), 10)
   ### Prepare the data for TE
   X = data.frame(
     var = hmbart_obj$data[, varname], 
@@ -12,7 +14,12 @@ dependentplot = function(hmbart_obj, varname, TE = FALSE, ylims_TE = NULL, ylims
     NDE = hmbart_obj$effects$NDE, 
     NIE = hmbart_obj$effects$NIE)
 
-    not_sig_TE = as.numeric(hmbart_obj$effects$TE.l < 0) * as.numeric(hmbart_obj$effects$TE.u > 0)
+  ### Settings for categorical
+  if(categorical){
+    k = 1
+    X$var = as.factor(X$var)
+  }
+  not_sig_TE = as.numeric(hmbart_obj$effects$TE.l < 0) * as.numeric(hmbart_obj$effects$TE.u > 0)
   dat_TE = data.frame(
     var = X$var,
     TE = X$TE,
@@ -24,11 +31,13 @@ dependentplot = function(hmbart_obj, varname, TE = FALSE, ylims_TE = NULL, ylims
     TE_1.u = ifelse(not_sig_TE == 0, hmbart_obj$effects$TE.u, NA)
   )
   ### Splines fit for TE
-  gam_model = gam(TE ~ s(var), data = X)
-  pred = predict(gam_model, newdata = X, se.fit = TRUE)
-  dat_TE$TE_gam = pred$fit
-  dat_TE$TE_gam.l = pred$fit - 1.96 * pred$se.fit
-  dat_TE$TE_gam.u = pred$fit + 1.96 * pred$se.fit
+  if(k > 3){
+    gam_model = gam(TE ~ s(var, k = k), data = X)
+    pred = predict(gam_model, newdata = X, se.fit = TRUE)
+    dat_TE$TE_gam = pred$fit
+    dat_TE$TE_gam.l = pred$fit - 1.96 * pred$se.fit
+    dat_TE$TE_gam.u = pred$fit + 1.96 * pred$se.fit
+  }
   
   ### Plot for TE
   if(is.null(ylims_TE)){
@@ -66,15 +75,17 @@ dependentplot = function(hmbart_obj, varname, TE = FALSE, ylims_TE = NULL, ylims
         y = "TE"
       ) +   theme_minimal()  
   }
-  plot_TE_gam = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
-    geom_point(aes(y = TE), color = "#1f77b4", size = 0.5) +
-    geom_line(aes(y = TE_gam), color = "#1f77b4") +
-    geom_ribbon(aes(ymin = TE_gam.l, ymax = TE_gam.u), alpha = 0.2, fill = "#1f77b4") + 
-    labs(
-      title = "",
-      x = varname,
-      y = "TE"
-    ) +   theme_minimal()
+  if(k > 3){
+    plot_TE_gam = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
+      geom_point(aes(y = TE), color = "#1f77b4", size = 0.5) +
+      geom_line(aes(y = TE_gam), color = "#1f77b4") +
+      geom_ribbon(aes(ymin = TE_gam.l, ymax = TE_gam.u), alpha = 0.2, fill = "#1f77b4") + 
+      labs(
+        title = "",
+        x = varname,
+        y = "TE"
+      ) +   theme_minimal()
+  }
 
   ### Prepare the data for NDE
   not_sig_NDE = as.numeric(hmbart_obj$effects$NDE.l < 0) * as.numeric(hmbart_obj$effects$NDE.u > 0)
@@ -89,11 +100,13 @@ dependentplot = function(hmbart_obj, varname, TE = FALSE, ylims_TE = NULL, ylims
     NDE_1.u = ifelse(not_sig_NDE == 0, hmbart_obj$effects$NDE.u, NA)
   )
   ### Splines fit for NDE
-  gam_model = gam(NDE ~ s(var), data = X)
-  pred = predict(gam_model, newdata = X, se.fit = TRUE)
-  dat_NDE$NDE_gam = pred$fit
-  dat_NDE$NDE_gam.l = pred$fit - 1.96 * pred$se.fit
-  dat_NDE$NDE_gam.u = pred$fit + 1.96 * pred$se.fit
+  if(k > 3){
+    gam_model = gam(NDE ~ s(var, k = k), data = X)
+    pred = predict(gam_model, newdata = X, se.fit = TRUE)
+    dat_NDE$NDE_gam = pred$fit
+    dat_NDE$NDE_gam.l = pred$fit - 1.96 * pred$se.fit
+    dat_NDE$NDE_gam.u = pred$fit + 1.96 * pred$se.fit
+  }
   
   ### Plot for NDE
   if(is.null(ylims_NDE)){
@@ -131,15 +144,17 @@ dependentplot = function(hmbart_obj, varname, TE = FALSE, ylims_TE = NULL, ylims
         y = "NDE"
       ) +   theme_minimal()  
   }
-  plot_NDE_gam = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
-    geom_point(aes(y = NDE), color = "#1f77b4", size = 0.5) +
-    geom_line(aes(y = NDE_gam), color = "#1f77b4") +
-    geom_ribbon(aes(ymin = NDE_gam.l, ymax = NDE_gam.u), alpha = 0.2, fill = "#1f77b4") + 
-    labs(
-      title = "",
-      x = varname,
-      y = "NDE"
-    ) +   theme_minimal()
+  if(k > 3){
+    plot_NDE_gam = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
+      geom_point(aes(y = NDE), color = "#1f77b4", size = 0.5) +
+      geom_line(aes(y = NDE_gam), color = "#1f77b4") +
+      geom_ribbon(aes(ymin = NDE_gam.l, ymax = NDE_gam.u), alpha = 0.2, fill = "#1f77b4") + 
+      labs(
+        title = "",
+        x = varname,
+        y = "NDE"
+      ) +   theme_minimal()
+  }
   
   ### Prepare the data for NIE
   not_sig_NIE = as.numeric(hmbart_obj$effects$NIE.l < 0) * as.numeric(hmbart_obj$effects$NIE.u > 0)
@@ -154,11 +169,13 @@ dependentplot = function(hmbart_obj, varname, TE = FALSE, ylims_TE = NULL, ylims
     NIE_1.u = ifelse(not_sig_NIE == 0, hmbart_obj$effects$NIE.u, NA)
   )
   ### Splines fit for NIE
-  gam_model = gam(NIE ~ s(var), data = X)
-  pred = predict(gam_model, newdata = X, se.fit = TRUE)
-  dat_NIE$NIE_gam = pred$fit
-  dat_NIE$NIE_gam.l = pred$fit - 1.96 * pred$se.fit
-  dat_NIE$NIE_gam.u = pred$fit + 1.96 * pred$se.fit
+  if(k > 3){
+    gam_model = gam(NIE ~ s(var, k = k), data = X)
+    pred = predict(gam_model, newdata = X, se.fit = TRUE)
+    dat_NIE$NIE_gam = pred$fit
+    dat_NIE$NIE_gam.l = pred$fit - 1.96 * pred$se.fit
+    dat_NIE$NIE_gam.u = pred$fit + 1.96 * pred$se.fit
+  }
   
   ### Plot for NIE
   if(is.null(ylims_NIE)){
@@ -196,24 +213,34 @@ dependentplot = function(hmbart_obj, varname, TE = FALSE, ylims_TE = NULL, ylims
         y = "NIE"
       ) +   theme_minimal()  
   }
-  plot_NIE_gam = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
-    geom_point(aes(y = NIE), color = "#1f77b4", size = 0.5) +
-    geom_line(aes(y = NIE_gam), color = "#1f77b4") +
-    geom_ribbon(aes(ymin = NIE_gam.l, ymax = NIE_gam.u), alpha = 0.2, fill = "#1f77b4") + 
-    labs(
-      title = "",
-      x = varname,
-      y = "NIE"
-    ) +   theme_minimal()
+  if(k > 3){
+    plot_NIE_gam = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
+      geom_point(aes(y = NIE), color = "#1f77b4", size = 0.5) +
+      geom_line(aes(y = NIE_gam), color = "#1f77b4") +
+      geom_ribbon(aes(ymin = NIE_gam.l, ymax = NIE_gam.u), alpha = 0.2, fill = "#1f77b4") + 
+      labs(
+        title = "",
+        x = varname,
+        y = "NIE"
+      ) +   theme_minimal()
+  }
   
   ### Combine and display
   if(TE){
-    combined_plot = grid.arrange(plot_TE_est, plot_NDE_est, plot_NIE_est,
-                                 plot_TE_gam, plot_NDE_gam, plot_NIE_gam, ncol = 3, nrow = 2)
+    if(k > 3){
+      combined_plot = grid.arrange(plot_TE_est, plot_NDE_est, plot_NIE_est,
+                                  plot_TE_gam, plot_NDE_gam, plot_NIE_gam, ncol = 3, nrow = 2)
+    } else {
+      combined_plot = grid.arrange(plot_TE_est, plot_NDE_est, plot_NIE_est, ncol = 1, nrow = 3)
+    }
   }else{
-    combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est,
-                                 plot_NDE_gam, plot_NIE_gam, ncol = 2, nrow = 2)
+    if(k > 3){
+      combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est,
+                                  plot_NDE_gam, plot_NIE_gam, ncol = 2, nrow = 2)
+    } else {
+      combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est, ncol = 2, nrow = 1)
+    }
   }
-  print(combined_plot)
+  invisible(combined_plot)
   
 }
