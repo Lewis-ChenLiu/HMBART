@@ -1,5 +1,5 @@
 #' @importFrom mgcv gam
-#' @importFrom ggplot2 ggplot aes geom_linerange geom_point geom_line geom_ribbon labs theme_minimal ylim
+#' @importFrom ggplot2 ggplot aes geom_linerange geom_point geom_line geom_smooth geom_ribbon labs theme_minimal ylim
 #' @importFrom gridExtra grid.arrange
 #' @export
 dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, ylims_TE = NULL, ylims_NDE = NULL, ylims_NIE = NULL) {
@@ -54,6 +54,18 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
         x = varname,
         y = "TE"
       ) +   theme_minimal() 
+    plot_TE_est1 = ggplot(dat_TE, aes(x = var, y = TE_0)) +
+      ylim(ylims) +
+      geom_smooth(aes(y = TE_0.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_smooth(aes(y = TE_0.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_point(color = "black", size = 0.5) +
+      geom_smooth(method = "gam", formula = y ~ s(x), se = FALSE, color = "black") +
+      labs(
+        title = "",
+        x = varname,
+        y = "TE"
+      ) +
+      theme_minimal()
   }else if(mean(is.na(dat_TE$TE_0)) == 1){
     plot_TE_est = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
       geom_linerange(aes(ymin = TE_1.l, ymax = TE_1.u), color = "#fee090", width = 0.1) +
@@ -63,6 +75,18 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
         x = varname,
         y = "TE"
       ) +   theme_minimal()  
+    plot_TE_est1 = ggplot(dat_TE, aes(x = var, y = TE_1)) +
+      ylim(ylims) +
+      geom_smooth(aes(y = TE_1.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_smooth(aes(y = TE_1.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_point(color = "#ff7f0e", size = 0.5) +
+      geom_smooth(method = "gam", formula = y ~ s(x), se = FALSE, color = "#ff7f0e") +
+      labs(
+        title = "",
+        x = varname,
+        y = "TE"
+      ) +
+      theme_minimal()
   }else{
     plot_TE_est = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
       geom_linerange(aes(ymin = TE_0.l, ymax = TE_0.u), color = "lightgrey", width = 0.1) +
@@ -74,6 +98,22 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
         x = varname,
         y = "TE"
       ) +   theme_minimal()  
+    plot_TE_est1 = ggplot(dat_TE, aes(x = var)) +
+      ylim(ylims) +
+      geom_smooth(aes(y = TE_0.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_smooth(aes(y = TE_0.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_smooth(aes(y = TE_1.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_smooth(aes(y = TE_1.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_point(aes(y = TE_0), color = "black", size = 0.5) +
+      geom_point(aes(y = TE_1), color = "#ff7f0e", size = 0.5) +
+      geom_smooth(aes(y = TE_0), method = "gam", formula = y ~ s(x), se = FALSE, color = "black") +
+      geom_smooth(aes(y = TE_1), method = "gam", formula = y ~ s(x), se = FALSE, color = "#ff7f0e") +
+      labs(
+        title = "",
+        x = varname,
+        y = "TE"
+      ) +
+      theme_minimal()
   }
   if(k > 3){
     plot_TE_gam = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
@@ -123,6 +163,18 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
         x = varname,
         y = "NDE"
       ) +   theme_minimal() 
+    plot_NDE_est1 = ggplot(dat_NDE, aes(x = var)) +
+      ylim(ylims) +
+      geom_smooth(aes(y = NDE_0.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_smooth(aes(y = NDE_0.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_point(aes(y = NDE_0), color = "black", size = 0.5) +
+      geom_smooth(aes(y = NDE_0), method = "gam", formula = y ~ s(x), se = FALSE, color = "black") +
+      labs(
+        title = "",
+        x = varname,
+        y = "NDE"
+      ) +
+      theme_minimal()
   }else if(mean(is.na(dat_NDE$NDE_0)) == 1){
     plot_NDE_est = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
       geom_linerange(aes(ymin = NDE_1.l, ymax = NDE_1.u), color = "#fee090", width = 0.1) +
@@ -132,6 +184,17 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
         x = varname,
         y = "NDE"
       ) +   theme_minimal()  
+    plot_NDE_est1 = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) +
+      geom_smooth(aes(y = NDE_1.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_smooth(aes(y = NDE_1.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_point(color = "#ff7f0e", size = 0.5) +
+      geom_smooth(method = "gam", formula = y ~ s(x), se = FALSE, color = "#ff7f0e") +
+      labs(
+        title = "",
+        x = varname,
+        y = "NDE"
+      ) +
+      theme_minimal()
   }else{
     plot_NDE_est = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
       geom_linerange(aes(ymin = NDE_0.l, ymax = NDE_0.u), color = "lightgrey", width = 0.1) +
@@ -143,6 +206,21 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
         x = varname,
         y = "NDE"
       ) +   theme_minimal()  
+    plot_NDE_est1 = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) +
+      geom_smooth(aes(y = NDE_0.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_smooth(aes(y = NDE_0.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_smooth(aes(y = NDE_1.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_smooth(aes(y = NDE_1.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_point(aes(y = NDE_0), color = "black", size = 0.5) +
+      geom_point(aes(y = NDE_1), color = "#ff7f0e", size = 0.5) +
+      geom_smooth(aes(y = NDE_0), method = "gam", formula = y ~ s(x), se = FALSE, color = "black") +
+      geom_smooth(aes(y = NDE_1), method = "gam", formula = y ~ s(x), se = FALSE, color = "#ff7f0e") +
+      labs(
+        title = "",
+        x = varname,
+        y = "NDE"
+      ) +
+      theme_minimal()
   }
   if(k > 3){
     plot_NDE_gam = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
@@ -192,6 +270,18 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
         x = varname,
         y = "NIE"
       ) +   theme_minimal() 
+    plot_NIE_est1 = ggplot(dat_NIE, aes(x = var)) +
+      ylim(ylims) +
+      geom_smooth(aes(y = NIE_0.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_smooth(aes(y = NIE_0.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_point(aes(y = NIE_0), color = "black", size = 0.5) +
+      geom_smooth(aes(y = NIE_0), method = "gam", formula = y ~ s(x), se = FALSE, color = "black") +
+      labs(
+        title = "",
+        x = varname,
+        y = "NIE"
+      ) +
+      theme_minimal()
   }else if(mean(is.na(dat_NIE$NIE_0)) == 1){
     plot_NIE_est = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
       geom_linerange(aes(ymin = NIE_1.l, ymax = NIE_1.u), color = "#fee090", width = 0.1) +
@@ -201,6 +291,17 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
         x = varname,
         y = "NIE"
       ) +   theme_minimal() 
+    plot_NIE_est1 = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) +
+      geom_smooth(aes(y = NIE_1.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_smooth(aes(y = NIE_1.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_point(color = "#ff7f0e", size = 0.5) +
+      geom_smooth(method = "gam", formula = y ~ s(x), se = FALSE, color = "#ff7f0e") +
+      labs(
+        title = "",
+        x = varname,
+        y = "NIE"
+      ) +
+      theme_minimal()
   }else{
     plot_NIE_est = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
       geom_linerange(aes(ymin = NIE_0.l, ymax = NIE_0.u), color = "lightgrey", width = 0.1) +
@@ -212,6 +313,21 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
         x = varname,
         y = "NIE"
       ) +   theme_minimal()  
+    plot_NIE_est1 = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) +
+      geom_smooth(aes(y = NIE_0.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_smooth(aes(y = NIE_0.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "lightgrey", linetype = "dashed") +
+      geom_smooth(aes(y = NIE_1.l), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_smooth(aes(y = NIE_1.u), method = "gam", formula = y ~ s(x), se = FALSE, color = "#fee090", linetype = "dashed") +
+      geom_point(aes(y = NIE_0), color = "black", size = 0.5) +
+      geom_point(aes(y = NIE_1), color = "#ff7f0e", size = 0.5) +
+      geom_smooth(aes(y = NIE_0), method = "gam", formula = y ~ s(x), se = FALSE, color = "black") +
+      geom_smooth(aes(y = NIE_1), method = "gam", formula = y ~ s(x), se = FALSE, color = "#ff7f0e") +
+      labs(
+        title = "",
+        x = varname,
+        y = "NIE"
+      ) +
+      theme_minimal()
   }
   if(k > 3){
     plot_NIE_gam = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
@@ -229,16 +345,20 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
   if(TE){
     if(k > 3){
       combined_plot = grid.arrange(plot_TE_est, plot_NDE_est, plot_NIE_est,
-                                  plot_TE_gam, plot_NDE_gam, plot_NIE_gam, ncol = 3, nrow = 2)
+                                  plot_TE_est1, plot_NDE_est1, plot_NIE_est1,
+                                  plot_TE_gam, plot_NDE_gam, plot_NIE_gam, ncol = 3, nrow = 3)
     } else {
-      combined_plot = grid.arrange(plot_TE_est, plot_NDE_est, plot_NIE_est, ncol = 1, nrow = 3)
+      combined_plot = grid.arrange(plot_TE_est, plot_NDE_est, plot_NIE_est, 
+                                   plot_TE_est1, plot_NDE_est1, plot_NIE_est1,ncol = 3, nrow = 2)
     }
   }else{
     if(k > 3){
       combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est,
-                                  plot_NDE_gam, plot_NIE_gam, ncol = 2, nrow = 2)
+                                  plot_NDE_est1, plot_NIE_est1,
+                                  plot_NDE_gam, plot_NIE_gam, ncol = 2, nrow = 3)
     } else {
-      combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est, ncol = 2, nrow = 1)
+      combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est, 
+                                  plot_NDE_est1, plot_NIE_est1, ncol = 2, nrow = 2)
     }
   }
   invisible(combined_plot)
