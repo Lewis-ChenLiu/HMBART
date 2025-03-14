@@ -47,7 +47,7 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
   }
   if(mean(is.na(dat_TE$TE_1)) == 1){
     plot_TE_est = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = TE_0.l, ymax = TE_0.u), color = "lightgrey") +
+      geom_linerange(aes(ymin = TE_0.l, ymax = TE_0.u), color = "lightgrey") +
       geom_point(aes(y = TE_0), color = "black", size = 0.5) +
       labs(
         title = "",
@@ -68,7 +68,7 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
       theme_minimal()
   }else if(mean(is.na(dat_TE$TE_0)) == 1){
     plot_TE_est = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = TE_1.l, ymax = TE_1.u), color = "#fee090") +
+      geom_linerange(aes(ymin = TE_1.l, ymax = TE_1.u), color = "#fee090") +
       geom_point(aes(y = TE_1), color = "#ff7f0e", size = 0.5) +
       labs(
         title = "",
@@ -89,8 +89,8 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
       theme_minimal()
   }else{
     plot_TE_est = ggplot(dat_TE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = TE_0.l, ymax = TE_0.u), color = "lightgrey") +
-      geom_errorbar(aes(ymin = TE_1.l, ymax = TE_1.u), color = "#fee090") +
+      geom_linerange(aes(ymin = TE_0.l, ymax = TE_0.u), color = "lightgrey") +
+      geom_linerange(aes(ymin = TE_1.l, ymax = TE_1.u), color = "#fee090") +
       geom_point(aes(y = TE_0), color = "black", size = 0.5) +
       geom_point(aes(y = TE_1), color = "#ff7f0e", size = 0.5) +
       labs(
@@ -156,7 +156,7 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
   }
   if(mean(is.na(dat_NDE$NDE_1)) == 1){
     plot_NDE_est = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NDE_0.l, ymax = NDE_0.u), color = "lightgrey") +
+      geom_linerange(aes(ymin = NDE_0.l, ymax = NDE_0.u), color = "lightgrey") +
       geom_point(aes(y = NDE_0), color = "black", size = 0.5) +
       labs(
         title = "",
@@ -177,7 +177,7 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
       theme_minimal()
   }else if(mean(is.na(dat_NDE$NDE_0)) == 1){
     plot_NDE_est = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NDE_1.l, ymax = NDE_1.u), color = "#fee090") +
+      geom_linerange(aes(ymin = NDE_1.l, ymax = NDE_1.u), color = "#fee090") +
       geom_point(aes(y = NDE_1), color = "#ff7f0e", size = 0.5) +
       labs(
         title = "",
@@ -197,8 +197,8 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
       theme_minimal()
   }else{
     plot_NDE_est = ggplot(dat_NDE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NDE_0.l, ymax = NDE_0.u), color = "lightgrey") +
-      geom_errorbar(aes(ymin = NDE_1.l, ymax = NDE_1.u), color = "#fee090") +
+      geom_linerange(aes(ymin = NDE_0.l, ymax = NDE_0.u), color = "lightgrey") +
+      geom_linerange(aes(ymin = NDE_1.l, ymax = NDE_1.u), color = "#fee090") +
       geom_point(aes(y = NDE_0), color = "black", size = 0.5) +
       geom_point(aes(y = NDE_1), color = "#ff7f0e", size = 0.5) +
       labs(
@@ -263,7 +263,7 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
   }
   if(mean(is.na(dat_NIE$NIE_1)) == 1){
     plot_NIE_est = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NIE_0.l, ymax = NIE_0.u), color = "lightgrey") +
+      geom_linerange(aes(ymin = NIE_0.l, ymax = NIE_0.u), color = "lightgrey") +
       geom_point(aes(y = NIE_0), color = "black", size = 0.5) +
       labs(
         title = "",
@@ -284,7 +284,7 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
       theme_minimal()
   }else if(mean(is.na(dat_NIE$NIE_0)) == 1){
     plot_NIE_est = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NIE_1.l, ymax = NIE_1.u), color = "#fee090") +
+      geom_linerange(aes(ymin = NIE_1.l, ymax = NIE_1.u), color = "#fee090") +
       geom_point(aes(y = NIE_1), color = "#ff7f0e", size = 0.5) +
       labs(
         title = "",
@@ -304,8 +304,8 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
       theme_minimal()
   }else{
     plot_NIE_est = ggplot(dat_NIE, aes(x = var)) + ylim(ylims) + 
-      geom_errorbar(aes(ymin = NIE_0.l, ymax = NIE_0.u), color = "lightgrey") +
-      geom_errorbar(aes(ymin = NIE_1.l, ymax = NIE_1.u), color = "#fee090") +
+      geom_linerange(aes(ymin = NIE_0.l, ymax = NIE_0.u), color = "lightgrey") +
+      geom_linerange(aes(ymin = NIE_1.l, ymax = NIE_1.u), color = "#fee090") +
       geom_point(aes(y = NIE_0), color = "black", size = 0.5) +
       geom_point(aes(y = NIE_1), color = "#ff7f0e", size = 0.5) +
       labs(
