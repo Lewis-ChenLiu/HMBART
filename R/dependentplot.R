@@ -2,7 +2,7 @@
 #' @importFrom ggplot2 ggplot aes geom_linerange geom_point geom_line geom_smooth geom_ribbon labs theme_minimal ylim
 #' @importFrom gridExtra grid.arrange
 #' @export
-dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, ylims_TE = NULL, ylims_NDE = NULL, ylims_NIE = NULL) {
+dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, ylims_TE = NULL, ylims_NDE = NULL, ylims_NIE = NULL, plot_each = FALSE) {
   
   hmbart_obj$effects = hmbart_obj$h_effects
   ### For variable have unique values less than 10 (default for spline)
@@ -344,23 +344,33 @@ dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, y
   ### Combine and display
   if(TE){
     if(k > 3){
-      combined_plot = grid.arrange(plot_TE_est, plot_NDE_est, plot_NIE_est,
-                                   plot_TE_est1, plot_NDE_est1, plot_NIE_est1,
-                                   plot_TE_gam, plot_NDE_gam, plot_NIE_gam, ncol = 3, nrow = 3)
+      plots = list(plot_TE_est, plot_NDE_est, plot_NIE_est,
+                   plot_TE_est1, plot_NDE_est1, plot_NIE_est1,
+                   plot_TE_gam, plot_NDE_gam, plot_NIE_gam)
+      combined_plot = do.call(grid.arrange, c(plots, ncol = 3, nrow = 3))
     } else {
-      combined_plot = grid.arrange(plot_TE_est, plot_NDE_est, plot_NIE_est, 
-                                   plot_TE_est1, plot_NDE_est1, plot_NIE_est1,ncol = 3, nrow = 2)
+      plots = list(plot_TE_est, plot_NDE_est, plot_NIE_est, 
+                   plot_TE_est1, plot_NDE_est1, plot_NIE_est1)
+      combined_plot = do.call(grid.arrange, c(plots, ncol = 3, nrow = 2))
     }
   }else{
     if(k > 3){
-      combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est,
-                                   plot_NDE_est1, plot_NIE_est1,
-                                   plot_NDE_gam, plot_NIE_gam, ncol = 2, nrow = 3)
+      plots = list(plot_NDE_est, plot_NIE_est,
+                   plot_NDE_est1, plot_NIE_est1,
+                   plot_NDE_gam, plot_NIE_gam)
+      combined_plot = do.call(grid.arrange, c(plots, ncol = 2, nrow = 3))
     } else {
-      combined_plot = grid.arrange(plot_NDE_est, plot_NIE_est, 
-                                   plot_NDE_est1, plot_NIE_est1, ncol = 2, nrow = 2)
+      plots = list(plot_NDE_est, plot_NIE_est, plot_NDE_est1, plot_NIE_est1)
+      combined_plot = do.call(grid.arrange, c(plots, ncol = 2, nrow = 2))
     }
   }
-  invisible(combined_plot)
+
+  if(plot_each){
+    for (p in plots) {
+      print(p)
+    }
+  }else{
+    invisible(combined_plot)
+  }
   
 }

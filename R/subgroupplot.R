@@ -2,7 +2,7 @@
 #' @importFrom ggplot2 ggplot aes geom_density facet_wrap theme_minimal labs
 #' @importFrom gridExtra grid.arrange
 #' @export
-subgroupplot = function(hmbart_obj, moderator_names = NULL, cp = 0.01, TE = FALSE, seed = 42) {
+subgroupplot = function(hmbart_obj, moderator_names = NULL, cp = 0.01, TE = FALSE, plot_each = FALSE, seed = 42) {
   
   set.seed(seed)
   hmbart_obj$effects = hmbart_obj$h_effects
@@ -64,10 +64,17 @@ subgroupplot = function(hmbart_obj, moderator_names = NULL, cp = 0.01, TE = FALS
     labs(x = "NIE", y = "Density", title = "Subgroup Summary - NIE")
   
   if(TE){
-    combined_plot = grid.arrange(p1, p2, p3, ncol = 3, nrow = 1)
+    if(plot_each){
+      print(p1); print(p2); print(p3);
+    }else{
+      invisible(grid.arrange(p1, p2, p3, ncol = 3, nrow = 1))
+    }
   } else {
-    combined_plot = grid.arrange(p2, p3, ncol = 2, nrow = 1)
+    if(plot_each){
+      print(p2); print(p3);
+    }else{
+      invisible(grid.arrange(p2, p3, ncol = 2, nrow = 1))
+    }
   }
-  invisible(combined_plot)
   
 }

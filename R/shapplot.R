@@ -2,7 +2,7 @@
 #' @importFrom ggplot2 ggtitle theme element_text
 #' @importFrom gridExtra grid.arrange
 #' @export
-shapplot = function(hmbart_obj, moderator_names = NULL, TE = FALSE, seed = 42) {
+shapplot = function(hmbart_obj, moderator_names = NULL, TE = FALSE, plot_each = FALSE, seed = 42) {
   
   library(SHAPforxgboost)
   ### Model
@@ -29,9 +29,17 @@ shapplot = function(hmbart_obj, moderator_names = NULL, TE = FALSE, seed = 42) {
   
   ### Display
   if(TE){
-    invisible(grid.arrange(shap_TE, shap_NDE, shap_NIE, ncol = 1, nrow = 3))
+    if(plot_each){
+      print(shap_TE); print(shap_NDE); print(shap_NIE);
+    }else{
+      invisible(grid.arrange(shap_TE, shap_NDE, shap_NIE, ncol = 1, nrow = 3))
+    }
   }else{
-    invisible(grid.arrange(shap_NDE, shap_NIE, ncol = 1, nrow = 2))
+    if(plot_each){
+      print(shap_NDE); print(shap_NIE);
+    }else{
+      invisible(grid.arrange(shap_NDE, shap_NIE, ncol = 1, nrow = 2))
+    }
   }
   
 }
