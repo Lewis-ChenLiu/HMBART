@@ -4,7 +4,7 @@
 hmbart = function(data, X, t, m, y, CV = FALSE,
                   num_trees = 50, num_tree_cvs = c(50), k_cvs = c(2, 3, 5),
                   nu_q_cvs = list(c(3, 0.9), c(3, 0.99), c(10, 0.75)),
-                  emb_shrink = TRUE, cluster_size = 10,
+                  emb_shrink = TRUE, cluster_size = 10, mc.cores = 1,
                   n_burn_in = 2000, n_after_burn_in = 500, n_process_samples = 1e5, seed = 42, fix = FALSE, 
                   argT = list(), argM = list(), argY = list()) {
   
@@ -103,7 +103,6 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
 
   get_post_samples_parallel = function(data_set, t_value) {
     data_set$t = t_value
-    mc.cores = max(1, detectCores() - 1)
     cl = makeCluster(mc.cores)
     clusterExport(cl, varlist = c('fit_y', 'data_set', 'breaks', 'bart_machine_get_posterior'), envir = environment())
     out = parLapply(cl, seq_along(breaks)[-length(breaks)], function(i) {
