@@ -4,7 +4,7 @@
 hmbart = function(data, X, t, m, y, CV = FALSE,
                   num_trees = 50, num_tree_cvs = c(50), k_cvs = c(2, 3, 5),
                   nu_q_cvs = list(c(3, 0.9), c(3, 0.99), c(10, 0.75)),
-                  emb_shrink = TRUE, cluster_size = 10, mc.cores = 1,
+                  emb_shrink = TRUE, cluster_size = 5,
                   n_burn_in = 2000, n_after_burn_in = 500, n_process_samples = 1e5, seed = 42, fix = FALSE, 
                   argT = list(), argM = list(), argY = list()) {
   
@@ -100,24 +100,38 @@ hmbart = function(data, X, t, m, y, CV = FALSE,
   ### Posterior sampling
   by_value = ifelse(nrow(data_y_m0) > 5 * n_process_samples, n_process_samples, as.integer(nrow(data_y_m0) / 5))
   breaks = c(seq(from = 1, to = nrow(data_y_m0), by = by_value), nrow(data_y_m0) + 1)
+  post_y0m0 = NULL; post_y1m0 = NULL; post_y1m1 = NULL;
 
-  get_post_samples_parallel = function(data_set, t_value) {
-    data_set$t = t_value
-    cl = makeCluster(mc.cores)
-    clusterExport(cl, varlist = c('fit_y', 'data_set', 'breaks', 'bart_machine_get_posterior'), envir = environment())
-    out = parLapply(cl, seq_along(breaks)[-length(breaks)], function(i) {
-      bart_machine_get_posterior(fit_y, data_set[breaks[i]:(breaks[i+1] - 1), ])$y_hat_posterior_samples
-    })
-    stopCluster(cl)
-    do.call(rbind, out)
- }
-  
+  ### Posterior sampling: y0m0
   cat('\n', 'Posterior Sampling: y0m0', '\n', sep = '')
-  post_y0m0 = get_post_samples_parallel(data_y_m0, t_value = 0)
+  pb = txtProgressBar(min = 1, max = length(breaks) - 1, style = 3)
+  data_y_m0$t = 0
+  for(i in 1:(length(breaks)-1)){
+    post_y0m0 = rbind(post_y0m0, bart_machine_get_posterior(fit_y, data_y_m0[breaks[i]:(breaks[i+1]-1),])$y_hat_posterior_samples)
+    setTxtProgressBar(pb, i)
+  }
+  close(pb)
+
+  ### Posterior sampling: y1m0
   cat('\n', 'Posterior Sampling: y1m0', '\n', sep = '')
-  post_y1m0 = get_post_samples_parallel(data_y_m0, t_value = 1)
+  pb = txtProgressBar(min = 1, max = length(breaks) - 1, style = 3)
+  data_y_m0$t = 1
+  for(i in 1:(length(breaks)-1)){
+    post_y1m0 = rbind(post_y1m0, bart_machine_get_posterior(fit_y, data_y_m0[breaks[i]:(breaks[i+1]-1),])$y_hat_posterior_samples)
+    setTxtProgressBar(pb, i)
+  }
+  close(pb)
+
+  ### Posterior sampling: y1m1
   cat('\n', 'Posterior Sampling: y1m1', '\n', sep = '')
-  post_y1m1 = get_post_samples_parallel(data_y_m1, t_value = 1)
+  pb = txtProgressBar(min = 1, max = length(breaks) - 1, style = 3)
+  data_y_m1$t = 1
+  for(i in 1:(length(breaks)-1)){
+    post_y1m1 = rbind(post_y1m1, bart_machine_get_posterior(fit_y, data_y_m1[breaks[i]:(breaks[i+1]-1),])$y_hat_posterior_samples)
+    setTxtProgressBar(pb, i)
+  }
+  close(pb)
+
 
   ### Summarize
   TE = c(); TE.l = c(); TE.u = c(); TE.var = c();
