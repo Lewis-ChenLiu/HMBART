@@ -188,9 +188,6 @@ for(st in start:n){
     dist_matrix = dist(scale(hcdata))
     hc = hclust(dist_matrix)
     clusters = cutree(hc, k = as.integer(size / 5))
-    if(input %in% c("dat5.rds", "dat6.rds")){
-      clusters = cutree(hc, k = as.integer(size / 25))
-    }
     
     k_cvs = c(2, 3, 5)
     nu_q_cvs = list(c(3, 0.9), c(3, 0.99), c(10, 0.75))
