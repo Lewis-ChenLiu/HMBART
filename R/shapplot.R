@@ -1,4 +1,4 @@
-#' @importFrom xgboost xgboost
+#' @importFrom xgboost xgb.train xgb.DMatrix
 #' @importFrom ggplot2 ggtitle theme element_text
 #' @importFrom gridExtra grid.arrange
 #' @export
@@ -12,9 +12,9 @@ shapplot = function(hmbart_obj, moderator_names = NULL, TE = FALSE, plot_each = 
   hmbart_obj$effects = hmbart_obj$h_effects
   
   set.seed(seed)
-  TE_model = xgboost(data = X, label = hmbart_obj$effects$TE, nrounds = 50, verbose = F)
-  NDE_model = xgboost(data = X, label = hmbart_obj$effects$NDE, nrounds = 50, verbose = F)
-  NIE_model = xgboost(data = X, label = hmbart_obj$effects$NIE, nrounds = 50, verbose = F)
+  TE_model = xgb.train(data = xgb.DMatrix(data = X, label = hmbart_obj$effects$TE), nrounds = 50, verbose = 0)
+  NDE_model = xgb.train(data = xgb.DMatrix(data = X, label = hmbart_obj$effects$NDE), nrounds = 50, verbose = 0)
+  NIE_model = xgb.train(data = xgb.DMatrix(data = X, label = hmbart_obj$effects$NIE), nrounds = 50, verbose = 0)
   
   ### Plot
   shap_TE = shap.prep(TE_model, X_train = X)
