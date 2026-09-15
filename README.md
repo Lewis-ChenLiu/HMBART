@@ -50,16 +50,16 @@ hmbart_obj = hmbart(data, X = c('x1', 'x2', 'x3', 'x4', 'x5'), t = 't', m = 'm',
 shapplot(hmbart_obj)
 ```
 
-The SHAP plot ranks variables by importance (top to bottom), with yellow indicating small values and red indicating large values.
+The SHAP plot ranks variables by importance from top to bottom. Each row corresponds to one variable and each dot corresponds to one individual. The horizontal position of a dot is the SHAP value of that variable for that individual, which measures how far the variable moves the estimated effect away from the average effect. Dots on the right indicate an upward contribution and dots on the left indicate a downward contribution. The color encodes the value of the variable itself, with yellow for small values and red for large values. The number printed beside each variable name is the mean absolute SHAP value, which is the quantity used for the ranking. A variable whose colors separate cleanly from one side to the other is acting as a moderator, because the direction of its contribution depends on its own value. The panels for NDE and NIE are fitted separately, so the two rankings may differ.
 
 ![SHAP Image](figs/shap.png)
 
 ```R
-### Dependent plot
+### Dependence plot
 dependentplot(hmbart_obj, 'x1')
 ```
 
-Dependency plots show how NDE and NIE change with the variable. Individual estimates are depicted as orange or black dots, with yellow or gray credible intervals; orange dots and yellow shades indicate statistically significant estimates. A GAM fit illustrates the trend, with blue dots for individual estimates and a blue curve tracing the smoothed NDE/NIE changes over the variable.
+The two columns correspond to the two effects, and the rows present the same individual estimates in two different ways. In the upper row each individual is plotted at its own value of the variable, with a vertical line covering the credible interval of that individual effect. The color marks whether the interval excludes zero. Orange dots with yellow intervals are individuals whose effect is statistically significant, meaning that the credible interval lies entirely above or entirely below zero, and black dots with grey intervals are individuals whose interval still covers zero. The location of the orange dots therefore shows over which range of the variable the effect can be distinguished from zero. The lower row summarizes the same estimates with a generalized additive model fitted to the individual point estimates. Blue dots are the individual estimates, the blue curve is the fitted trend, and the blue band is the 95 percent confidence band of that fitted trend. The band describes uncertainty in the estimated shape of the trend and should not be read as the spread of the individual effects, which is shown in the upper row instead. A curve that is close to flat indicates that the variable does not moderate the effect, while a curve with a clear slope or bend indicates moderation.
 
 ![Dependent Image](figs/dep.png)
 
@@ -68,7 +68,7 @@ Dependency plots show how NDE and NIE change with the variable. Individual estim
 treeplot(hmbart_obj)
 ```
 
-Decision trees to identify subgroups, with branch conditions defining moderators. Node values show estimated effects, and percentages represent subgroup proportions.
+The tree plot approximates the individual estimates with a regression tree so that the heterogeneity can be read as a small number of subgroups. Each split reports the variable and the cut value that best separate individuals with different effects, so the variables appearing in the tree are the estimated moderators. Following a path from the root to a leaf gives the definition of one subgroup. Within each leaf the upper number is the average estimated effect in that subgroup and the lower number is the percentage of the sample falling into it. The trees for NDE and NIE are grown separately and may select different variables and different cut values. The tree summarizes the fitted effects rather than defining a new model, so the leaf values inherit the uncertainty of the individual estimates and leaves covering a small percentage of the sample should be interpreted with caution.
 
 ![Dependent Image](figs/tree.png)
 
