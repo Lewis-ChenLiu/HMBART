@@ -2,7 +2,7 @@
 #' @importFrom ggplot2 ggplot aes geom_linerange geom_point geom_line geom_smooth geom_ribbon labs theme_minimal ylim
 #' @importFrom gridExtra grid.arrange
 #' @export
-dependentplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, ylims_TE = NULL, ylims_NDE = NULL, ylims_NIE = NULL, plot_each = FALSE) {
+dependenceplot = function(hmbart_obj, varname, categorical = FALSE, TE = FALSE, ylims_TE = NULL, ylims_NDE = NULL, ylims_NIE = NULL, plot_each = FALSE) {
   
   hmbart_obj$effects = hmbart_obj$h_effects
   ### For variable have unique values less than 10 (default for spline)
