@@ -56,7 +56,7 @@ The SHAP plot ranks variables by importance from top to bottom. Each row corresp
 
 ```R
 ### Dependence plot
-dependentplot(hmbart_obj, 'x1')
+dependenceplot(hmbart_obj, 'x1')
 ```
 
 The two columns correspond to the two effects, and the rows present the same individual estimates in two different ways. In the upper row each individual is plotted at its own value of the variable, with a vertical line covering the credible interval of that individual effect. The color marks whether the interval excludes zero. Orange dots with yellow intervals are individuals whose effect is statistically significant, meaning that the credible interval lies entirely above or entirely below zero, and black dots with grey intervals are individuals whose interval still covers zero. The location of the orange dots therefore shows over which range of the variable the effect can be distinguished from zero. The lower row summarizes the same estimates with a generalized additive model fitted to the individual point estimates. Blue dots are the individual estimates, the blue curve is the fitted trend, and the blue band is the 95 percent confidence band of that fitted trend. The band describes uncertainty in the estimated shape of the trend and should not be read as the spread of the individual effects, which is shown in the upper row instead. A curve that is close to flat indicates that the variable does not moderate the effect, while a curve with a clear slope or bend indicates moderation.
